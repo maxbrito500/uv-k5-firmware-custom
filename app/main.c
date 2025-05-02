@@ -683,6 +683,17 @@ static void MAIN_Key_UP_DOWN(bool bKeyPressed, bool bKeyHeld, int8_t Direction)
 
 void MAIN_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 {
+
+	static uint32_t last_audio_process = 0;
+    
+    // Process audio every 100ms in RX mode
+    if (gCurrentFunction == FUNCTION_RECEIVE && 
+        SYSTEM_GetTicks() - last_audio_process > 100) {
+        last_audio_process = SYSTEM_GetTicks();
+        GEORGRAM_ProcessAudio();
+    }
+
+
 #ifdef ENABLE_FMRADIO
 	if (gFmRadioMode && Key != KEY_PTT && Key != KEY_EXIT) {
 		if (!bKeyHeld && bKeyPressed)

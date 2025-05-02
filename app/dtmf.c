@@ -261,6 +261,21 @@ void DTMF_HandleRequest(void)
 
 	gDTMF_RX_pending = false;
 
+	// Verificar sequência "0880"
+if (gDTMF_RX_index >= 4 && strstr(gDTMF_RX, "0880") != NULL) {
+	BK4819_EnterDTMF_TX(gEeprom.DTMF_SIDE_TONE);
+	BK4819_PlayDTMFString(
+		"8008",
+		1,
+		gEeprom.DTMF_FIRST_CODE_PERSIST_TIME,
+		gEeprom.DTMF_HASH_CODE_PERSIST_TIME,
+		gEeprom.DTMF_CODE_PERSIST_TIME,
+		gEeprom.DTMF_CODE_INTERVAL_TIME);
+	BK4819_ExitDTMF_TX(false);
+	DTMF_clear_RX();
+	return;
+}
+
 	if (gDTMF_RX_index >= 9)
 	{	// look for the KILL code
 
