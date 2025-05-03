@@ -1,9 +1,17 @@
-#ifndef __GEORGRAM_H__
-#define __GEORGRAM_H__
+#ifndef GEOGRAM_H
+#define GEOGRAM_H
 
 #include <stdint.h>
 
-void GEORGRAM_ProcessAudio(void);
-char GEORGRAM_DetectDTMF(const int16_t *samples, uint16_t size);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void GEOGRAM_ProcessAudio(void);
+char GEOGRAM_GetLastDigit(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

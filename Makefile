@@ -13,7 +13,7 @@ ENABLE_VOX                    ?= 1
 ENABLE_ALARM                  ?= 0
 ENABLE_TX1750                 ?= 0
 ENABLE_PWRON_PASSWORD         ?= 0
-ENABLE_DTMF_CALLING           ?= 1
+ENABLE_DTMF_CALLING           ?= 0
 ENABLE_FLASHLIGHT             ?= 1
 
 # ---- CUSTOM MODS ----
@@ -108,6 +108,8 @@ ifeq ($(ENABLE_UART),1)
 endif
 
 # Main
+OBJS += app/geogram.o
+
 OBJS += app/action.o
 ifeq ($(ENABLE_AIRCOPY),1)
 	OBJS += app/aircopy.o
