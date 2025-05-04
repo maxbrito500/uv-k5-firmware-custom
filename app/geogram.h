@@ -1,17 +1,9 @@
 #ifndef GEOGRAM_H
 #define GEOGRAM_H
 
-#include <stdint.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void GEOGRAM_ProcessAudio(void);
-char GEOGRAM_GetLastDigit(void);
-
-#ifdef __cplusplus
-}
-#endif
+void GEOGRAM_Init(void);
+void GEOGRAM_EnableRXMonitoring(void);
+void GEOGRAM_ForceMicPath(void); 
+void GEOGRAM_Hook(void);
 
 #endif

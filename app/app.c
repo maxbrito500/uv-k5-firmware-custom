@@ -971,6 +971,9 @@ void APP_Update(void)
 
 		gPowerSaveCountdownExpired = false;
 	}
+
+	extern void GEOGRAM_Hook(void);
+	GEOGRAM_Hook();
 }
 
 // called every 10ms

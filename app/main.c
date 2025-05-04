@@ -43,8 +43,6 @@
 #include "ui/ui.h"
 #include <stdlib.h>
 
-#include "geogram.h"
-#include "driver/systick.h"
 
 
 void toggle_chan_scanlist(void)
@@ -687,23 +685,6 @@ static void MAIN_Key_UP_DOWN(bool bKeyPressed, bool bKeyHeld, int8_t Direction)
 
 void MAIN_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 {
-
-
-    // DTMF Detection Timer
-    static uint32_t systick_accumulator = 0;
-    
-    // Non-blocking delay using systick
-    SYSTICK_DelayUs(1000);  // Advance time by 1ms
-    systick_accumulator += 1000;
-    
-    // Check every 100ms when receiving
-    if (gCurrentFunction == FUNCTION_RECEIVE && systick_accumulator >= 100000) {
-        systick_accumulator = 0;
-		GEOGRAM_ProcessAudio();
-    }
-
-
-
 	
 #ifdef ENABLE_FMRADIO
 	if (gFmRadioMode && Key != KEY_PTT && Key != KEY_EXIT) {

@@ -1,94 +1,44 @@
 #include "geogram.h"
 #include "driver/bk4819.h"
-#include "ui/ui.h"
+#include "ui/helper.h"
 
-#define SAMPLE_BUFFER_SIZE 128
-#define SAMPLE_RATE 8000
-#define DTMF_THRESHOLD 1e6
+static uint16_t gLastMicLevel = 0;
+static uint32_t gUpdateCounter = 0;
 
-
-// Coeficientes Goertzel pré-calculados: 2 * cos(2πf / Fs)
-static const float GOERTZEL_COEFFS[] = {
-    1.624,  // 697 Hz
-    1.506,  // 770 Hz
-    1.389,  // 852 Hz
-    1.260,  // 941 Hz
-    0.875,  // 1209 Hz
-    0.658,  // 1336 Hz
-    0.446   // 1477 Hz
-};
-
-// Dígito detectado
-static char dtmf_display = ' ';
-
-// Acesso externo ao último dígito
-char GEOGRAM_GetLastDigit(void) {
-    return dtmf_display;
+void GEOGRAM_ForceMicPath(void) {
+    // Critical registers to enable microphone monitoring
+    BK4819_WriteRegister(0x19, 0x0000);  // Enable MIC AGC
+    BK4819_WriteRegister(0x30, 0xC1FE);  // Enable RX DSP path
+    BK4819_WriteRegister(0x47, 0x6040);  // Configure AF path
+    BK4819_WriteRegister(0x48, 0xB3A8);  // Set AF RX gains
 }
 
-// Implementação do algoritmo de Goertzel
-static float goertzel(const int16_t *samples, float coeff) {
-    float q0, q1 = 0, q2 = 0;
-
-    for (uint16_t i = 0; i < SAMPLE_BUFFER_SIZE; i++) {
-        q0 = coeff * q1 - q2 + samples[i];
-        q2 = q1;
-        q1 = q0;
-    }
-    return q1*q1 + q2*q2 - coeff*q1*q2;
+void GEOGRAM_Init(void) {
+    // Initial setup
+    GEOGRAM_ForceMicPath();  // Use our new function
 }
 
-// Execução periódica no main loop
-void GEOGRAM_ProcessAudio(void) {
-    int16_t sample_buffer[SAMPLE_BUFFER_SIZE];
-    static char last_digit = '\0';
-    static uint8_t digit_count = 0;
+void GEOGRAM_EnableRXMonitoring(void) {
+    // RX-specific configuration
+    GEOGRAM_ForceMicPath();  // Reuse the same function
+}
 
-    // Captura de amostras de áudio
-    for (uint16_t i = 0; i < SAMPLE_BUFFER_SIZE; i++) {
-        sample_buffer[i] = BK4819_ReadRegister(0x7F) >> 4;
-    }
-
-    // Potência nas 7 frequências
-    float row_power[4], col_power[3];
-    for (uint8_t i = 0; i < 4; i++) {
-        row_power[i] = goertzel(sample_buffer, GOERTZEL_COEFFS[i]);
-    }
-    for (uint8_t i = 0; i < 3; i++) {
-        col_power[i] = goertzel(sample_buffer, GOERTZEL_COEFFS[4 + i]);
-    }
-
-    // Maior potência em linha/coluna
-    uint8_t row_max = 0, col_max = 0;
-    for (uint8_t i = 1; i < 4; i++) {
-        if (row_power[i] > row_power[row_max]) row_max = i;
-    }
-    for (uint8_t i = 1; i < 3; i++) {
-        if (col_power[i] > col_power[col_max]) col_max = i;
-    }
-
-    // Verificação de limiar
-    if (row_power[row_max] > DTMF_THRESHOLD &&
-        col_power[col_max] > DTMF_THRESHOLD) {
-
-        const char digits[4][3] = {
-            {'1','2','3'},
-            {'4','5','6'},
-            {'7','8','9'},
-            {'*','0','#'}
-        };
-
-        char current = digits[row_max][col_max];
-
-        // Detecção com debounce simples
-        if (current == last_digit) {
-            if (++digit_count == 2) {
-                dtmf_display = current;
-                // Ação customizada pode ser adicionada aqui
-            }
-        } else {
-            digit_count = 0;
-            last_digit = current;
-        }
-    }
+void GEOGRAM_Hook(void) {
+    if (++gUpdateCounter < 3) return; // Update every ~30ms
+    gUpdateCounter = 0;
+    
+    GEOGRAM_ForceMicPath();  // Continually reinforce the path
+    
+    gLastMicLevel = BK4819_ReadRegister(0x64) & 0x7FFF;
+    
+    char buffer[8];
+    buffer[0] = 'M';
+    buffer[1] = ':';
+    buffer[2] = '0' + (gLastMicLevel / 1000) % 10;
+    buffer[3] = '0' + (gLastMicLevel / 100) % 10;
+    buffer[4] = '0' + (gLastMicLevel / 10) % 10;
+    buffer[5] = '0' + gLastMicLevel % 10;
+    buffer[6] = '\0';
+    
+    UI_PrintStringSmallNormal(buffer, 0, 127, false);
 }
