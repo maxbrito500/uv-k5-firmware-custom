@@ -50,7 +50,7 @@
 #include "ui/welcome.h"
 #include "ui/menu.h"
 
-#include "app/geogram.h"
+
 
 void _putchar(__attribute__((unused)) char c)
 {
@@ -229,7 +229,6 @@ void Main(void)
 		if (gNextTimeslice) {
 
 			APP_TimeSlice10ms();
-			GEOGRAM_Hook();
 
 			if (gNextTimeslice_500ms) {
 				APP_TimeSlice500ms();

@@ -67,9 +67,9 @@ void UI_DisplayWelcome(void)
 			EEPROM_ReadBuffer(0x0EC0, WelcomeString1, 16);
 		}
 
-		UI_PrintString("GEOGRAM", 0, 127, 0, 10);
+		UI_PrintString("GEOGRAM!", 0, 127, 0, 10);
 		UI_PrintString(WelcomeString1, 0, 127, 2, 10);
-		UI_PrintStringSmallNormal(Version, 0, 128, 6);
+		//UI_PrintStringSmallNormal(Version, 0, 128, 6);
 
 		ST7565_BlitStatusLine();  // blank status line
 		ST7565_BlitFullScreen();

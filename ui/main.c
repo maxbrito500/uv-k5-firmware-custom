@@ -37,6 +37,8 @@
 #include "ui/main.h"
 #include "ui/ui.h"
 
+#include "app/geogram.h"
+
 center_line_t center_line = CENTER_LINE_NONE;
 
 const int8_t dBmCorrTable[7] = {
@@ -792,6 +794,8 @@ void UI_DisplayMain(void)
 	}
 
 	ST7565_BlitFullScreen();
+	// show our changes
+	GEOGRAM_Hook();
 }
 
 // ***************************************************************************
