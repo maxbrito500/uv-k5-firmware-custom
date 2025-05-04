@@ -43,9 +43,6 @@
 #include "ui/ui.h"
 #include <stdlib.h>
 
-#include "geogram.h"
-#include "driver/systick.h"
-
 
 void toggle_chan_scanlist(void)
 {	// toggle the selected channels scanlist setting
@@ -688,7 +685,7 @@ static void MAIN_Key_UP_DOWN(bool bKeyPressed, bool bKeyHeld, int8_t Direction)
 void MAIN_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 {
 
-
+/*
     // DTMF Detection Timer
     static uint32_t systick_accumulator = 0;
     
@@ -701,7 +698,7 @@ void MAIN_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
         systick_accumulator = 0;
 		GEOGRAM_ProcessAudio();
     }
-
+*/
 
 
 	

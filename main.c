@@ -49,6 +49,9 @@
 #include "ui/lock.h"
 #include "ui/welcome.h"
 #include "ui/menu.h"
+
+#include "app/geogram.h"
+
 void _putchar(__attribute__((unused)) char c)
 {
 
@@ -75,6 +78,7 @@ void Main(void)
 
 	SYSTICK_Init();
 	BOARD_Init();
+	
 
 	boot_counter_10ms = 250;   // 2.5 sec
 
@@ -225,6 +229,7 @@ void Main(void)
 		if (gNextTimeslice) {
 
 			APP_TimeSlice10ms();
+			GEOGRAM_Hook();
 
 			if (gNextTimeslice_500ms) {
 				APP_TimeSlice500ms();
