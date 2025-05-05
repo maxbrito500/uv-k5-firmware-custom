@@ -96,8 +96,6 @@ void Main(void)
 	gDTMF_String[sizeof(gDTMF_String) - 1] = 0;
 
 	BK4819_Init();
-	GEOGRAM_ForceMicPath();
-
 
 	BOARD_ADC_GetBatteryInfo(&gBatteryCurrentVoltage, &gBatteryCurrent);
 
@@ -127,10 +125,6 @@ void Main(void)
 	{
 		gF_LOCK = true;            // flag to say include the hidden menu items
 	}
-
-
-	GEOGRAM_Init();
-	GEOGRAM_EnableRXMonitoring();
 
 
 	// count the number of menu items
@@ -235,12 +229,11 @@ void Main(void)
 
 	while (true) {
 		APP_Update();
-		
 
 		if (gNextTimeslice) {
 			APP_TimeSlice10ms();
 			GEOGRAM_Hook(); 
-
+			
 			if (gNextTimeslice_500ms) {
 				APP_TimeSlice500ms();
 			}
